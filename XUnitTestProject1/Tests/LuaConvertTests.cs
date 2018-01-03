@@ -1,11 +1,17 @@
 using System;
 using Luaon;
 using Xunit;
+using Xunit.Abstractions;
 
-namespace XUnitTestProject1
+namespace XUnitTestProject1.Tests
 {
-    public class LuaConvertTests
+    public class LuaConvertTests : TestsBase
     {
+        /// <inheritdoc />
+        public LuaConvertTests(ITestOutputHelper output) : base(output)
+        {
+        }
+
         [Fact]
         public void ToStringTest()
         {
@@ -21,5 +27,6 @@ namespace XUnitTestProject1
             Assert.Equal("-12345", LuaConvert.ToString((object)-12345));
             Assert.Equal("123.45", LuaConvert.ToString((object)123.45));
         }
+
     }
 }

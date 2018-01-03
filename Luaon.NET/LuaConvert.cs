@@ -13,37 +13,37 @@ namespace Luaon
     {
 
         /// <summary>
-        /// The LUA representation of <c>true</c>.
+        /// The Lua representation of <c>true</c>.
         /// </summary>
         public static readonly string True = "true";
 
         /// <summary>
-        /// The LUA representation of <c>false</c>.
+        /// The Lua representation of <c>false</c>.
         /// </summary>
         public static readonly string False = "false";
 
         /// <summary>
-        /// The LUA representation of <c>nil</c>.
+        /// The Lua representation of <c>nil</c>.
         /// </summary>
         public static readonly string Nil = "nil";
 
         /// <summary>
-        /// The LUA representation of positive infinity.
+        /// The Lua representation of positive infinity.
         /// </summary>
         public static readonly string PositiveInfinity = "math.huge";
 
         /// <summary>
-        /// The LUA representation of negative infinity.
+        /// The Lua representation of negative infinity.
         /// </summary>
         public static readonly string NegativeInfinity = "-math.huge";
 
         /// <summary>
-        /// The LUA representation of nan.
+        /// The Lua representation of nan.
         /// </summary>
         public static readonly string NaN = "0/0";
 
         /// <summary>
-        /// Converts the <see cref="bool"/> value into LUA representation.
+        /// Converts the <see cref="bool"/> value into Lua representation.
         /// </summary>
         /// <param name="value">The value to convert.</param>
         public static string ToString(bool value)
@@ -51,78 +51,167 @@ namespace Luaon
             return value ? True : False;
         }
 
-        /// <summary>Converts the <see cref="char"/> value into LUA expression.</summary>
+        /// <summary>
+        /// Converts the nullable <see cref="bool"/> value into Lua representation.
+        /// </summary>
+        /// <param name="value">The value to convert.</param>
+        public static string ToString(bool? value)
+        {
+            if (value == null) return Nil;
+            return value.Value ? True : False;
+        }
+
+        /// <summary>Converts the <see cref="char"/> value into Lua expression.</summary>
         /// <param name="value">The value to convert.</param>
         public static string ToString(char value)
         {
             return ToString(value.ToString());
         }
 
-        /// <summary>Converts the <see cref="byte"/> value into LUA expression.</summary>
+        /// <summary>Converts the nullable <see cref="char"/> value into Lua expression.</summary>
+        /// <param name="value">The value to convert.</param>
+        public static string ToString(char? value)
+        {
+            if (value == null) return Nil;
+            return ToString(value.ToString());
+        }
+
+        /// <summary>Converts the <see cref="byte"/> value into Lua expression.</summary>
         /// <param name="value">The value to convert.</param>
         public static string ToString(byte value)
         {
             return value.ToString(CultureInfo.InvariantCulture);
         }
 
-        /// <summary>Converts the <see cref="sbyte"/> value into LUA expression.</summary>
+        /// <summary>Converts the nullable <see cref="byte"/> value into Lua expression.</summary>
+        /// <param name="value">The value to convert.</param>
+        public static string ToString(byte? value)
+        {
+            if (value == null) return Nil;
+            return value.Value.ToString(CultureInfo.InvariantCulture);
+        }
+
+        /// <summary>Converts the <see cref="sbyte"/> value into Lua expression.</summary>
         /// <param name="value">The value to convert.</param>
         public static string ToString(sbyte value)
         {
             return value.ToString(CultureInfo.InvariantCulture);
         }
 
-        /// <summary>Converts the <see cref="short"/> value into LUA expression.</summary>
+        /// <summary>Converts the nullable <see cref="sbyte"/> value into Lua expression.</summary>
+        /// <param name="value">The value to convert.</param>
+        public static string ToString(sbyte? value)
+        {
+            if (value == null) return Nil;
+            return value.Value.ToString(CultureInfo.InvariantCulture);
+        }
+
+        /// <summary>Converts the <see cref="short"/> value into Lua expression.</summary>
         /// <param name="value">The value to convert.</param>
         public static string ToString(short value)
         {
             return value.ToString(CultureInfo.InvariantCulture);
         }
 
-        /// <summary>Converts the <see cref="ushort"/> value into LUA expression.</summary>
+        /// <summary>Converts the nullable <see cref="short"/> value into Lua expression.</summary>
+        /// <param name="value">The value to convert.</param>
+        public static string ToString(short? value)
+        {
+            if (value == null) return Nil;
+            return value.Value.ToString(CultureInfo.InvariantCulture);
+        }
+
+        /// <summary>Converts the <see cref="ushort"/> value into Lua expression.</summary>
         /// <param name="value">The value to convert.</param>
         public static string ToString(ushort value)
         {
             return value.ToString(CultureInfo.InvariantCulture);
         }
 
+        /// <summary>Converts the nullable <see cref="ushort"/> value into Lua expression.</summary>
+        /// <param name="value">The value to convert.</param>
+        public static string ToString(ushort? value)
+        {
+            if (value == null) return Nil;
+            return value.Value.ToString(CultureInfo.InvariantCulture);
+        }
 
-        /// <summary>Converts the <see cref="int"/> value into LUA expression.</summary>
+        /// <summary>Converts the <see cref="int"/> value into Lua expression.</summary>
         /// <param name="value">The value to convert.</param>
         public static string ToString(int value)
         {
             return value.ToString(CultureInfo.InvariantCulture);
         }
 
-        /// <summary>Converts the <see cref="uint"/> value into LUA expression.</summary>
+        /// <summary>Converts the nullable <see cref="int"/> value into Lua expression.</summary>
+        /// <param name="value">The value to convert.</param>
+        public static string ToString(int? value)
+        {
+            if (value == null) return Nil;
+            return value.Value.ToString(CultureInfo.InvariantCulture);
+        }
+
+        /// <summary>Converts the <see cref="uint"/> value into Lua expression.</summary>
         /// <param name="value">The value to convert.</param>
         public static string ToString(uint value)
         {
             return value.ToString(CultureInfo.InvariantCulture);
         }
 
-        /// <summary>Converts the <see cref="long"/> value into LUA expression.</summary>
+        /// <summary>Converts the nullable <see cref="uint"/> value into Lua expression.</summary>
+        /// <param name="value">The value to convert.</param>
+        public static string ToString(uint? value)
+        {
+            if (value == null) return Nil;
+            return value.Value.ToString(CultureInfo.InvariantCulture);
+        }
+
+        /// <summary>Converts the <see cref="long"/> value into Lua expression.</summary>
         /// <param name="value">The value to convert.</param>
         public static string ToString(long value)
         {
             return value.ToString(CultureInfo.InvariantCulture);
         }
 
-        /// <summary>Converts the <see cref="ulong"/> value into LUA expression.</summary>
+        /// <summary>Converts the nullable <see cref="long"/> value into Lua expression.</summary>
+        /// <param name="value">The value to convert.</param>
+        public static string ToString(long? value)
+        {
+            if (value == null) return Nil;
+            return value.Value.ToString(CultureInfo.InvariantCulture);
+        }
+
+        /// <summary>Converts the <see cref="ulong"/> value into Lua expression.</summary>
         /// <param name="value">The value to convert.</param>
         public static string ToString(ulong value)
         {
             return value.ToString(CultureInfo.InvariantCulture);
         }
 
-        /// <summary>Converts the <see cref="decimal"/> value into LUA expression.</summary>
+        /// <summary>Converts the nullable <see cref="ulong"/> value into Lua expression.</summary>
+        /// <param name="value">The value to convert.</param>
+        public static string ToString(ulong? value)
+        {
+            if (value == null) return Nil;
+            return value.Value.ToString(CultureInfo.InvariantCulture);
+        }
+
+        /// <summary>Converts the <see cref="decimal"/> value into Lua expression.</summary>
         /// <param name="value">The value to convert.</param>
         public static string ToString(decimal value)
         {
             return value.ToString(CultureInfo.InvariantCulture);
         }
 
-        /// <summary>Converts the <see cref="float"/> value into LUA expression.</summary>
+        /// <summary>Converts the nullable <see cref="decimal"/> value into Lua expression.</summary>
+        /// <param name="value">The value to convert.</param>
+        public static string ToString(decimal? value)
+        {
+            if (value == null) return Nil;
+            return value.Value.ToString(CultureInfo.InvariantCulture);
+        }
+
+        /// <summary>Converts the <see cref="float"/> value into Lua expression.</summary>
         /// <param name="value">The value to convert.</param>
         public static string ToString(float value)
         {
@@ -132,7 +221,15 @@ namespace Luaon
             return value.ToString(CultureInfo.InvariantCulture);
         }
 
-        /// <summary>Converts the <see cref="float"/> value into LUA expression.</summary>
+        /// <summary>Converts the nullable <see cref="float"/> value into Lua expression.</summary>
+        /// <param name="value">The value to convert.</param>
+        public static string ToString(float? value)
+        {
+            if (value == null) return Nil;
+            return ToString(value.Value);
+        }
+
+        /// <summary>Converts the <see cref="float"/> value into Lua expression.</summary>
         /// <param name="value">The value to convert.</param>
         public static string ToString(double value)
         {
@@ -142,8 +239,16 @@ namespace Luaon
             return value.ToString(CultureInfo.InvariantCulture);
         }
 
+        /// <summary>Converts the nullable <see cref="double"/> value into Lua expression.</summary>
+        /// <param name="value">The value to convert.</param>
+        public static string ToString(double? value)
+        {
+            if (value == null) return Nil;
+            return ToString(value.Value);
+        }
+
         /// <summary>
-        /// Converts the <see cref="string"/> value into LUA expression.
+        /// Converts the <see cref="string"/> value into Lua expression.
         /// </summary>
         /// <param name="value">The value to convert.</param>
         /// <remarks>
@@ -154,7 +259,7 @@ namespace Luaon
             return ToString(value, "\"");
         }
 
-        /// <summary>Converts the <see cref="Uri"/> value into LUA expression.</summary>
+        /// <summary>Converts the <see cref="Uri"/> value into Lua expression.</summary>
         /// <param name="value">The value to convert.</param>
         public static string ToString(Uri value)
         {
@@ -162,34 +267,58 @@ namespace Luaon
             return ToString(value.ToString());
         }
 
-        /// <summary>Converts the <see cref="TimeSpan"/> value into LUA expression.</summary>
+        /// <summary>Converts the <see cref="TimeSpan"/> value into Lua expression.</summary>
         /// <param name="value">The value to convert.</param>
         public static string ToString(TimeSpan value)
         {
             return ToString(value.ToString());
         }
 
-        /// <summary>Converts the <see cref="DateTime"/> value into LUA expression.</summary>
+        /// <summary>Converts the nullable <see cref="TimeSpan"/> value into Lua expression.</summary>
+        /// <param name="value">The value to convert.</param>
+        public static string ToString(TimeSpan? value)
+        {
+            if (value == null) return Nil;
+            return ToString(value.Value.ToString());
+        }
+
+        /// <summary>Converts the <see cref="DateTime"/> value into Lua expression.</summary>
         /// <param name="value">The value to convert.</param>
         public static string ToString(DateTime value)
         {
             return ToString(value.ToString("O"));
         }
 
-        /// <summary>Converts the <see cref="DateTimeOffset"/> value into LUA expression.</summary>
+        /// <summary>Converts the nullable <see cref="DateTime"/> value into Lua expression.</summary>
+        /// <param name="value">The value to convert.</param>
+        public static string ToString(DateTime? value)
+        {
+            if (value == null) return Nil;
+            return ToString(value.Value.ToString("O"));
+        }
+
+        /// <summary>Converts the <see cref="DateTimeOffset"/> value into Lua expression.</summary>
         /// <param name="value">The value to convert.</param>
         public static string ToString(DateTimeOffset value)
         {
             return ToString(value.ToString("O"));
         }
 
+        /// <summary>Converts the nullable <see cref="DateTimeOffset"/> value into Lua expression.</summary>
+        /// <param name="value">The value to convert.</param>
+        public static string ToString(DateTimeOffset? value)
+        {
+            if (value == null) return Nil;
+            return ToString(value.Value.ToString("O"));
+        }
+
         /// <summary>
-        /// Converts the <see cref="string"/> value into LUA expression.
+        /// Converts the <see cref="string"/> value into Lua expression.
         /// </summary>
         /// <param name="value">The value to convert.</param>
-        /// <param name="delimiter">The delimiter used to start the LUA string expression.</param>
+        /// <param name="delimiter">The delimiter used to start the Lua string expression.</param>
         /// <remarks>
-        /// LUA supports starting a string expression with <c>'</c>, <c>"</c>, or <c>[====[</c>, where in
+        /// Lua supports starting a string expression with <c>'</c>, <c>"</c>, or <c>[====[</c>, where in
         /// the last case, there can be any (including 0) count of equal signs.
         /// </remarks>
         public static string ToString(string value, string delimiter)
@@ -203,7 +332,7 @@ namespace Luaon
         }
 
         /// <summary>
-        /// Converts any simple value into LUA expression.
+        /// Converts any simple value into Lua expression.
         /// </summary>
         /// <param name="value">The value to convert.</param>
         /// <remarks>The value passed in should be suiltable for any other of <c>ToString</c> overloads.</remarks>
