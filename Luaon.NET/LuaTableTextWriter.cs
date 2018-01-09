@@ -217,6 +217,18 @@ namespace Luaon
         /// <summary>
         /// Writes a Lua table field key.
         /// </summary>
+        public virtual void WriteKey(long key)
+        {
+            WriteStartKey();
+            WriteLiteral(key);
+            WriteEndKey();
+            currentContext.Key = key.ToString();
+            currentContext.KeyIsExpression = true;
+        }
+
+        /// <summary>
+        /// Writes a Lua table field key.
+        /// </summary>
         public virtual void WriteKey(object key)
         {
             if (key == null) throw new ArgumentNullException(nameof(key));
