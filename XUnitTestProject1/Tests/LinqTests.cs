@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Luaon;
 using Luaon.Linq;
 using Xunit;
 using Xunit.Abstractions;
@@ -46,8 +47,8 @@ namespace XUnitTestProject1.Tests
             Assert.Equal(1, table["Child"][1]);
             Assert.Equal(2, table["Child"][2]);
             Assert.Equal(3, table["Child"][3]);
-            var s = table.ToString();
-            Output.WriteLine(s);
+            Assert.Equal("{[\"Test1\"]=1,2,[\"Test2\"]=3,4.5,[20]=5,[true]=\"6\",[\"Child\"]={1,2,3,4,5}}",
+                table.ToString(Formatting.None));
         }
 
 

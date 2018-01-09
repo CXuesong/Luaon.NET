@@ -39,6 +39,7 @@ namespace Luaon
         private readonly List<LuaContainerContext> contextStack;
         private LuaContainerContext currentContext;
         private State currentState = State.Start;
+        private int _Indentation;
 
         // NextState[State][Token]
         private static readonly State[][] NextStateTable =
@@ -60,6 +61,8 @@ namespace Luaon
             currentContext = new LuaContainerContext(LuaContainerType.None);
             contextStack = new List<LuaContainerContext>();
             CloseWriter = true;
+            Indentation = 2;
+            IndentChar = ' ';
         }
 
         /// <summary>
@@ -84,6 +87,26 @@ namespace Luaon
                 _Formatting = value;
             }
         }
+
+        /// <summary>
+        /// Gets or sets how many <see cref="IndentChar"/>s to write for each level in the hierarchy
+        /// when <see cref="Formatting"/> is set to <see cref="Formatting.Prettified"/>.
+        /// </summary>
+        public int Indentation
+        {
+            get { return _Indentation; }
+            set
+            {
+                if (value < 0) throw new ArgumentOutOfRangeException(nameof(value));
+                _Indentation = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets/sets which character to use for indenting
+        /// when <see cref="Formatting"/> is set to <see cref="Formatting.Prettified"/>.
+        /// </summary>
+        public char IndentChar { get; set; }
 
         private void GotoNextState(Token token)
         {
@@ -157,8 +180,14 @@ namespace Luaon
         {
             AssertContainerType(LuaContainerType.Table);
             GotoNextState(Token.TableEnd);
-            Writer.Write('}');
             Pop();
+            if ((Formatting & Formatting.Prettified) == Formatting.Prettified)
+            {
+                Writer.WriteLine();
+                WriteIndentation();
+            }
+
+            Writer.Write('}');
         }
 
         /// <summary>
@@ -246,6 +275,12 @@ namespace Luaon
             currentContext.KeyIsExpression = true;
         }
 
+        protected virtual void WriteIndentation()
+        {
+            var chars = Indentation * contextStack.Count;
+            for (int i = 0; i < chars; i++) Writer.Write(IndentChar);
+        }
+
         public virtual void WriteFieldDelimiter()
         {
             // Can be , or ;
@@ -256,8 +291,10 @@ namespace Luaon
         {
             var s = currentState;
             GotoNextState(nextToken);
+
             if (s == State.FieldStart)
             {
+                // In the middle of a table.
                 if (currentContext.Key != null)
                 {
                     currentContext.Key = null;
@@ -266,7 +303,17 @@ namespace Luaon
                 {
                     currentContext.CurrentIndex++;
                 }
+
                 WriteFieldDelimiter();
+            }
+
+            if (nextToken != Token.TableEnd && (s == State.TableStart || s == State.FieldStart))
+            {
+                if ((Formatting & Formatting.Prettified) == Formatting.Prettified)
+                {
+                    Writer.WriteLine();
+                    WriteIndentation();
+                }
             }
         }
 
