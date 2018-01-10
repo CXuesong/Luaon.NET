@@ -52,6 +52,10 @@ namespace XUnitTestProject1.Tests
                 tw.WriteLiteral(456);
                 tw.WriteKey(TimeSpan.FromHours(3.2));
                 tw.WriteNil();
+                tw.WriteKey("while");
+                tw.WriteNil();
+                tw.WriteKey("function");
+                tw.WriteNil();
 
                 // Though it's meaningless…
                 tw.WriteStartKey();
@@ -64,7 +68,7 @@ namespace XUnitTestProject1.Tests
 
                 tw.WriteEndTable();
                 tw.Flush();
-                Assert.Equal("{[\"Test\"]=\"value\",[123]=456,[\"03:12:00\"]=nil,[{1,2}]=123}", sw.ToString());
+                Assert.Equal("{Test=\"value\",[123]=456,[\"03:12:00\"]=nil,[\"while\"]=nil,[\"function\"]=nil,[{1,2}]=123}", sw.ToString());
             }
         }
 
@@ -94,7 +98,7 @@ namespace XUnitTestProject1.Tests
 
                 tw.WriteEndTable();
                 tw.Flush();
-                Assert.Equal("{{1,2,3},4,[\"Named5\"]=5{6,[\"Named7\"]=7}}", sw.ToString());
+                Assert.Equal("{{1,2,3},4,Named5=5{6,Named7=7}}", sw.ToString());
             }
         }
 

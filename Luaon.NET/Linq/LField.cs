@@ -75,7 +75,11 @@ namespace Luaon.Linq
                         writer.WriteKey((string)Name);
                         break;
                     default:
+#if NETSTANDARD2_0
                         Debug.Fail("Invalid Name.TokenType.");
+#else
+                        Debug.Assert(false);
+#endif
                         break;
                 }
             }

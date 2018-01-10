@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Reflection;
 using System.Text;
 
 namespace Luaon
@@ -17,7 +18,11 @@ namespace Luaon
 
         public static Type GetUnderlyingType(Type t)
         {
+#if NETSTANDARD2_0
             if (t.IsEnum) return Enum.GetUnderlyingType(t);
+#else
+            if (t.GetTypeInfo().IsEnum) return Enum.GetUnderlyingType(t);
+#endif
             var ut = Nullable.GetUnderlyingType(t);
             if (ut != null) return ut;
             return t;

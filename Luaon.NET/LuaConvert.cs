@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
-using System.Numerics;
-using System.Reflection.Metadata;
 using System.Text;
 
 namespace Luaon
@@ -41,6 +39,53 @@ namespace Luaon
         /// The Lua representation of nan.
         /// </summary>
         public static readonly string NaN = "0/0";
+
+        private static readonly HashSet<string> reservedKeywords = new HashSet<string>
+        {
+            "and", "break", "do", "else", "elseif",
+            "end", "false", "for", "function", "if",
+            "in", "local", "nil", "not", "or",
+            "repeat", "return", "then", "true", "until", "while"
+        };
+
+        private const int MIN_KEYWORD_LENGTH = 2;
+        private const int MAX_KEYWORD_LENGTH = 8;
+
+        /// <summary>
+        /// Determines whether the specified expression can be a valid identifier.
+        /// </summary>
+        /// <param name="expression">The name expression to be checked.</param>
+        /// <returns>
+        /// <c>true</c> if <paramref name="expression"/> can be a valid Name
+        /// (as defined in <a href="http://www.lua.org/manual/5.1/manual.html#2.1">Chapter 2.1, Lua Manual</a>)
+        /// and does not conflict with any reserved keywords.
+        /// </returns>
+        public static bool IsValidIdentifier(string expression)
+        {
+            if (expression == null) throw new ArgumentNullException(nameof(expression));
+            if (expression.Length == 0) return false;
+            if (expression.Length >= MIN_KEYWORD_LENGTH && expression.Length <= MAX_KEYWORD_LENGTH
+                                                        && expression[0] > 'a' && expression[0] < 'z')
+            {
+                // Check for keyword
+                if (reservedKeywords.Contains(expression)) return false;
+            }
+            // Lua only allows ASCII characters as identifiers
+            if (!(expression[0] == '_'
+                  || expression[0] >= 'A' && expression[0] <= 'Z'
+                  || expression[0] >= 'a' && expression[0] <= 'z')) return false;
+            for (int i = 0; i < expression.Length; i++)
+            {
+                if (!(expression[i] == '_'
+                      || expression[i] >= 'A' && expression[i] <= 'Z'
+                      || expression[i] >= 'a' && expression[i] <= 'z'
+                      || expression[i] >= '0' && expression[i] <= '9')) return false;
+            }
+
+            return true;
+        }
+
+        #region ToString methods
 
         /// <summary>
         /// Converts the <see cref="bool"/> value into Lua representation.
@@ -359,6 +404,8 @@ namespace Luaon
             if (ut == typeof(DateTimeOffset)) return ToString((DateTimeOffset)value);
             throw new ArgumentException($"Unsupported type: {ut}.");
         }
+
+        #endregion
 
         internal static void WriteEscapedString(string value, StringDelimiterInfo delimiter, TextWriter writer)
         {

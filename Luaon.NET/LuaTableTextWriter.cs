@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -40,6 +39,7 @@ namespace Luaon
         private LuaContainerContext currentContext;
         private State currentState = State.Start;
         private int _Indentation;
+        private int _MaxUnquotedNameLength = 64;
 
         // NextState[State][Token]
         private static readonly State[][] NextStateTable =
@@ -74,6 +74,23 @@ namespace Luaon
         /// Gets/sets a value that determines whether to close the underlying writer unpon disposal.
         /// </summary>
         public bool CloseWriter { get; set; }
+
+        /// <summary>
+        /// Gets/sets the maximum allowed table field name that will be checked for chance of
+        /// using <c>Name = </c> expression instad of <c>["key"] = </c>, to reduce the
+        /// generated code length and improve redability.
+        /// </summary>
+        /// <value>A positive value, or <c>0</c> to disable this feature.</value>
+        /// <remarks>The default value is <c>64</c>.</remarks>
+        public int MaxUnquotedNameLength
+        {
+            get { return _MaxUnquotedNameLength; }
+            set
+            {
+                if (value < 0) throw new ArgumentOutOfRangeException(nameof(value));
+                _MaxUnquotedNameLength = value;
+            }
+        }
 
         protected bool IsClosed { get; private set; }
 
@@ -148,7 +165,11 @@ namespace Luaon
                     currentState = State.Key;
                     break;
                 default:
+#if NETSTANDARD2_0
                     Debug.Fail("Invalid ContainerType.");
+#else
+                    Debug.Assert(false);
+#endif
                     break;
             }
             // Return the poped container type
@@ -221,14 +242,30 @@ namespace Luaon
         /// <summary>
         /// Writes a Lua table field key.
         /// </summary>
+        /// <param name="key">The key content to write.</param>
         public virtual void WriteKey(string key)
         {
             if (key == null) throw new ArgumentNullException(nameof(key));
-            WriteStartKey();
-            WriteLiteral(key);
-            WriteEndKey();
-            currentContext.Key = key;
-            currentContext.KeyIsExpression = false;
+            if (key.Length <= MaxUnquotedNameLength && LuaConvert.IsValidIdentifier(key))
+            {
+                AssertContainerType(LuaContainerType.Table);
+                DelimitLastValue(Token.KeyStart);
+                GotoNextState(Token.Literal);
+                Writer.Write(key);
+                if ((_Formatting & Formatting.Prettified) == Formatting.Prettified)
+                    Writer.Write(" = ");
+                else
+                    Writer.Write("=");
+                GotoNextState(Token.KeyEnd);
+            }
+            else
+            {
+                WriteStartKey();
+                WriteLiteral(key);
+                WriteEndKey();
+                currentContext.Key = key;
+                currentContext.KeyIsExpression = false;
+            }
         }
 
         /// <summary>

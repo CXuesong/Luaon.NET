@@ -1,15 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.Serialization;
 using System.Security;
 using System.Text;
+#if NETSTANDARD2_0
+using System.Runtime.Serialization;
+#endif
 
 namespace Luaon
 {
     /// <summary>
     /// Base type of Luaon.NET exceptions.
     /// </summary>
+#if NETSTANDARD2_0
     [Serializable]
+#endif
     public class LuaonException : Exception
     {
 
@@ -25,15 +29,19 @@ namespace Luaon
         {
         }
 
+#if NETSTANDARD2_0
         [SecurityCritical]
         protected LuaonException(
             SerializationInfo info,
             StreamingContext context) : base(info, context)
         {
         }
+#endif
     }
 
+#if NETSTANDARD2_0
     [Serializable]
+#endif
     public class LuaTableWriterException : LuaonException
     {
 
@@ -54,6 +62,7 @@ namespace Luaon
         {
         }
 
+#if NETSTANDARD2_0
         [SecurityCritical]
         protected LuaTableWriterException(
             SerializationInfo info,
@@ -68,6 +77,7 @@ namespace Luaon
             base.GetObjectData(info, context);
             info.AddValue("Path", Path);
         }
+#endif
 
         /// <summary>
         /// Gets the Lua property path where the exception happens.

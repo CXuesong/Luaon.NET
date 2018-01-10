@@ -35,7 +35,7 @@ namespace Luaon.Linq
             base.SetItem(index, item);
             if (oldField != item && oldField.Name != item.Name)
             {
-                if (fieldsDict.Remove(oldField.Name, out var itemInDict))
+                if (fieldsDict.TryGetValue(oldField.Name, out var itemInDict) && fieldsDict.Remove(oldField.Name))
                 {
                     // There might be duplicate keys…
                     if (oldField != itemInDict) fieldsDict.Add(itemInDict.Name, itemInDict);
@@ -49,7 +49,7 @@ namespace Luaon.Linq
         {
             var oldField = Items[index];
             base.RemoveItem(index);
-            if (fieldsDict.Remove(oldField.Name, out var itemInDict))
+            if (fieldsDict.TryGetValue(oldField.Name, out var itemInDict) && fieldsDict.Remove(oldField.Name))
             {
                 // There might be duplicate keys…
                 if (oldField != itemInDict) fieldsDict.Add(itemInDict.Name, itemInDict);
@@ -102,8 +102,11 @@ namespace Luaon.Linq
                 positionalIndex++;
                 if (name == positionalIndex) return i;
             }
-
+#if NETSTANDARD2_0
             Debug.Fail("Should not execute to here.");
+#else
+            Debug.Assert(false);
+#endif
             return null;
         }
 
