@@ -2,6 +2,21 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard1.1;netstandard2.0</TargetFrameworks>
+    <PackageId>CXuesong.Luaon.Json</PackageId>
+    <Version>0.1.0</Version>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <Copyright>Copyright (C) CXuesong 2018</Copyright>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>CXuesong</Authors>
+    <Company />
+    <Product />
+    <Description>Newtonsoft.Json adapter for Luaon.NET.</Description>
+    <PackageLicenseUrl>http://www.apache.org/licenses/LICENSE-2.0</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/CXuesong/Luaon.NET</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/CXuesong/Luaon.NET</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>lua lua-table json</PackageTags>
+    <PackageReleaseNotes>See https://github.com/CXuesong/Luaon.NET/releases.</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
