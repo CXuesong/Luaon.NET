@@ -163,7 +163,7 @@ namespace Luaon.Json
         protected override void WriteIndent()
         {
             var indentCount = nestedLevel * Indentation;
-            if (currentIdentation == null || currentIdentation.Length - currentIdentationNewLine.Length < indentCount)
+            if (currentIdentation == null || currentIdentation.Length < currentIdentationNewLine.Length + indentCount)
             {
                 var newLine = writer.NewLine;
                 var chars = new char[newLine.Length + indentCount];

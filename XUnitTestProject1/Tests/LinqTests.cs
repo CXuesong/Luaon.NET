@@ -49,8 +49,22 @@ namespace XUnitTestProject1.Tests
             Assert.Equal(3, table["Child"][3]);
             Assert.Equal("{Test1=1,2,Test2=3,4.5,[20]=5,[true]=\"6\",Child={1,2,3,4,5}}",
                 table.ToString(Formatting.None));
+            Assert.Equal(@"{
+  Test1 = 1,
+  2,
+  Test2 = 3,
+  4.5,
+  [20] = 5,
+  [true] = ""6"",
+  Child = {
+    1,
+    2,
+    3,
+    4,
+    5
+  }
+}", table.ToString());
         }
-
 
     }
 }

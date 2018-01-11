@@ -338,8 +338,8 @@ namespace Luaon
             {
                 var newLine = Writer.NewLine;
                 var chars = new char[newLine.Length + indentCount];
-                newLine.CopyTo(0, chars, 0, chars.Length);
-                for (int i = newLine.Length; i < newLine.Length; i++) chars[i] = _IndentChar;
+                newLine.CopyTo(0, chars, 0, newLine.Length);
+                for (int i = newLine.Length; i < chars.Length; i++) chars[i] = _IndentChar;
                 currentIdentation = chars;
                 currentIdentationNewLine = newLine;
             }
