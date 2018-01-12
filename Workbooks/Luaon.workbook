@@ -1,0 +1,94 @@
+---
+uti: com.xamarin.workbook
+id: 87471c2e-6d90-49ef-94e1-6ad4663015b0
+title: Luaon
+platforms:
+- DotNetCore
+packages:
+- id: CXuesong.Luaon
+  version: 0.1.1
+- id: CXuesong.Luaon.Json
+  version: 0.1.0
+---
+
+```csharp
+#r "Luaon.NET"
+```
+
+```csharp
+using Luaon;
+```
+
+You can convert various values into Lua expressions with `LuaConvert`.
+
+```csharp
+LuaConvert.ToString(12345)
+```
+
+```csharp
+LuaConvert.ToString("string expression\n\nNew line")
+```
+
+```csharp
+// Custom string delimiter
+LuaConvert.ToString("string expression\n\nNew line", "[=====[")
+```
+
+Like `Newtonsoft.Json.Linq`, you can create a `LTable`, insert values into it, and convert it into string of Lua expression.
+
+```csharp
+using Luaon.Linq;
+var table = new LTable();
+table.Add("Item1");
+table.Add("Item2");
+table.Add("Item3");
+table.Add("Key1", 123);
+table.Add("Key2", 456);
+table.Add("Key with space", 789);
+table.Add("Item4");
+table.Add(100, "Value100");
+table.Add("ChildTable", new LTable(1, 2, 3, 4, 5));
+table.ToString();
+```
+
+```csharp
+// You can access table fields in a LUA way.
+(table[1], table[4], table["Key with space"], table[100], table["ChildTable"][2])
+```
+
+```csharp
+// You can convert LValue from and to other basic data types, just like JValue
+(int)table["Key2"] * 100
+```
+
+For advanced users, you can operate on `LuaTableTextWriter` directly. But the API of this class might be subject to some major changes. Anyway, I’m making it feel like `JsonTextWriter`, except that for now it does not provide auto-completion. You need to close the table expression manually.
+
+```csharp
+using System.IO;
+using (var sw = new StringWriter())
+{
+    using (var lw = new LuaTableTextWriter(sw) {
+        Formatting = Formatting.Prettified,
+        CloseWriter = false
+    })
+    {
+        lw.WriteStartTable();
+        lw.WriteLiteral("Records");
+        lw.WriteKey("Updated");
+        lw.WriteLiteral(DateTime.Now);
+
+        lw.WriteKey("Item1");
+        lw.WriteStartTable();
+        lw.WriteLiteral("Value1");
+        lw.WriteLiteral("Value2");
+        lw.WriteLiteral("Value3");
+        lw.WriteEndTable();
+
+        lw.WriteKey("Item2");
+        table["ChildTable"].WriteTo(lw);
+        
+        lw.WriteEndTable();
+    }
+    return sw.ToString();
+}
+```

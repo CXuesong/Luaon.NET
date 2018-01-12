@@ -1,0 +1,50 @@
+---
+uti: com.xamarin.workbook
+id: 28bfdbe0-89c3-48c2-9fb4-8a306c6758e3
+title: Luaon.Json
+platforms:
+- DotNetCore
+packages:
+- id: CXuesong.Luaon
+  version: 0.1.1
+- id: CXuesong.Luaon.Json
+  version: 0.1.0
+---
+
+```csharp
+#r "Luaon.NET"
+#r "Luaon.Json"
+```
+
+```csharp
+using Luaon.Json;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+```
+
+We also have a `JsonWriter` implementation that allows you to write JSON in Lua way.
+
+```csharp
+using System.IO;
+
+var obj = new {
+    Name = "Graystripe",
+    Affiliation = new {
+        Current = "ThunderClan",
+        Past = new [] { "RiverClan", "Kittypet", "Loner" },
+    },
+    Age = 132   // Months
+};
+
+var serializer = new JsonSerializer();
+using (var sw = new StringWriter())
+{
+    using (var jlw = new JsonLuaWriter(sw) {
+        CloseOutput = false,
+        Formatting = Formatting.Indented})
+    {
+        serializer.Serialize(jlw, obj);
+    }
+    return sw.ToString();
+}
+```
