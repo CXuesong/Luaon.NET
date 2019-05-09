@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Text;
 using Luaon;
@@ -19,24 +20,43 @@ namespace XUnitTestProject1.Tests
 
         private LuaTableTextReader CreateReader(string content)
         {
-            return new LuaTableTextReader(new StringReader(content.Replace("\r\n", "\n"))) {CloseReader = true};
+            return new LuaTableTextReader(new StringReader(content.Replace("\r\n", "\n"))) { CloseReader = true };
         }
 
-        [Fact]
-        public void ReadLiteralTest()
+        [Theory]
+        [InlineData("true", true)]
+        [InlineData("false", false)]
+        [InlineData("true   -- Comment", true)]
+        [InlineData("-- Comment\nfalse-- Comment", false)]
+        [InlineData("nil", null)]
+        [InlineData("0/0", double.NaN)]
+        [InlineData("123", 123)]
+        [InlineData("-0x45f", -0x45f)]
+        [InlineData("'abc'", "abc")]
+        [InlineData("\"def\\t\"", "def\t")]
+        [InlineData("[[ghi\\t\\]]", "ghi\\t\\")]
+        public void ReadLiteralTest(string expr, object value)
         {
-            using (var reader = CreateReader("true false nil 0/0 123 -0x45f 'abc' \"def\\t\" [[ghi\\]]"))
+            using (var reader = CreateReader(expr))
             {
-                AssertNextToken(reader, LuaTableReaderToken.Value, true);
-                AssertNextToken(reader, LuaTableReaderToken.Value, false);
-                AssertNextToken(reader, LuaTableReaderToken.Value, null);
-                AssertNextToken(reader, LuaTableReaderToken.Value, double.NaN);
-                AssertNextToken(reader, LuaTableReaderToken.Value, 123);
-                AssertNextToken(reader, LuaTableReaderToken.Value, -0x45f);
-                AssertNextToken(reader, LuaTableReaderToken.Value, "abc");
-                AssertNextToken(reader, LuaTableReaderToken.Value, "def\t");
-                AssertNextToken(reader, LuaTableReaderToken.Value, "ghi\\");
+                Assert.Equal(LuaTableReaderToken.None, reader.CurrentToken);
+                Assert.Null(reader.CurrentValue);
+                AssertNextToken(reader, LuaTableReaderToken.Value, value);
                 AssertNextToken(reader, LuaTableReaderToken.None);
+                AssertNextToken(reader, LuaTableReaderToken.None);
+            }
+        }
+
+        [Theory]
+        [InlineData("true false")]
+        [InlineData("true -- Comment\n123")]
+        [InlineData("true,")]
+        public void ReadExtraContentTest(string expr)
+        {
+            using (var reader = CreateReader(expr))
+            {
+                reader.Read();
+                Assert.Throws<LuaTableReaderException>(() => reader.Read());
             }
         }
 

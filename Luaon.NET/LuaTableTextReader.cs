@@ -53,25 +53,26 @@ namespace Luaon
         private enum State
         {
             Unknown = 0, // Determined by context (e.g. When leaving the current scope)
-            Start = 1, // outside of table
-            FieldStart, // At the middle of the table, but immediately after a field separator
-            KeyStart, // At the beginning of table key expression []
-            Key, // In table key expression, after the key literal
-            KeyEnd, // Immediately after a key expression
-            ValueStart, // Immediately after key expression and an equal sign
-            FieldEnd, // (Should) immediately before a field separator
+            Start = 1,   // outside of table
+            FieldStart,  // At the middle of the table, but immediately after a field separator
+            KeyStart,    // At the beginning of table key expression []
+            Key,         // In table key expression, after the key literal
+            KeyEnd,      // Immediately after a key expression
+            ValueStart,  // Immediately after key expression and an equal sign
+            FieldEnd,    // (Should) immediately before a field separator
+            End,         // (Should be) end of input
             Error
         }
 
         private enum Token
         {
             TableStart, // {
-            TableEnd, // }
-            KeyStart, // [
-            KeyEnd, // ]
-            Equal, // =
-            Comma, // ,
-            Literal, // "abc"
+            TableEnd,   // }
+            KeyStart,   // [
+            KeyEnd,     // ]
+            Equal,      // =
+            Comma,      // ,
+            Literal,    // "abc"
         }
 
         // NextState[State][Token]
@@ -80,30 +81,29 @@ namespace Luaon
             // @formatter:off
             /*                          TableStart        TableEnd        KeyStart         KeyEnd           Equal              Comma              Literal  */
             /* Unknown      */ new[] {State.Error,      State.Error,    State.Error,    State.Error,    State.Error,        State.Error,        State.Error},
-            /* Start        */ new[] {State.FieldStart, State.Error,    State.Error,    State.Error,    State.Error,        State.Error,        State.Start},
+            /* Start        */ new[] {State.FieldStart, State.Error,    State.Error,    State.Error,    State.Error,        State.Error,        State.End},
             /* FieldStart   */ new[] {State.FieldStart, State.Unknown,  State.KeyStart, State.Error,    State.Error,        State.Error,        State.FieldEnd},
             /* KeyStart     */ new[] {State.FieldStart, State.Error,    State.Error,    State.Error,    State.Error,        State.Error,        State.Key},
             /* Key          */ new[] {State.Error,      State.Error,    State.Error,    State.KeyEnd,   State.Error,        State.Error,        State.Error},
             /* KeyEnd       */ new[] {State.Error,      State.Error,    State.Error,    State.Error,    State.ValueStart,   State.Error,        State.FieldStart},
             /* ValueStart   */ new[] {State.FieldStart, State.Error,    State.Error,    State.Error,    State.Error,        State.Error,        State.FieldEnd},
             /* FieldEnd     */ new[] {State.Error,      State.Unknown,  State.Error,    State.Error,    State.Error,        State.FieldStart,   State.Error},
+            /* End          */ new[] {State.Error,      State.Error,    State.Error,    State.Error,    State.Error,        State.Error,        State.Error},
             /* Error        */ new[] {State.Error,      State.Error,    State.Error,    State.Error,    State.Error,        State.Error,        State.Error},
             // @formatter:on
         };
 
         private State currentState = State.Start;
 
-        private void AssertNextStateValid(Token token)
-        {
-            if (NextStateTable[(int)currentState][(int)token] == State.Error)
-                throw MakeReaderException($"Unexpected token: {token}.");
-        }
-
         private void GotoNextState(Token token)
         {
             var next = NextStateTable[(int)currentState][(int)token];
             if (next == State.Error)
+            {
+                if (currentState == State.End)
+                    throw MakeReaderException("Detected extra content after the end of LUA object.");
                 throw MakeReaderException($"Unexpected token: {token}.");
+            }
             currentState = next;
         }
 
@@ -128,7 +128,7 @@ namespace Luaon
             {
                 case LuaContainerType.None:
                     Debug.Assert(contextStack.Count == 0);
-                    currentState = State.Start;
+                    currentState = State.End;
                     break;
                 case LuaContainerType.Table:
                     currentState = context.ContainerType == LuaContainerType.Key
@@ -142,7 +142,7 @@ namespace Luaon
                     Debug.Assert(false, "Invalid ContainerType.");
                     break;
             }
-            // Return the poped container type
+            // Return the popped container type
             return context.ContainerType;
         }
 
@@ -696,7 +696,6 @@ namespace Luaon
             var sb = new StringBuilder(32);
             if (Consume("0x", true))
             {
-                sb.Append("0x");
             NEXT_HEX_DIGIT:
                 var c = LookAhead();
                 if (c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f')
@@ -709,21 +708,20 @@ namespace Luaon
                 try
                 {
                     // 0x00000000
-                    if (expr.Length < 2 + 8)
+                    if (expr.Length < 8)
                     {
-                        var v = Convert.ToInt32(expr) * signFactor;
+                        var v = Convert.ToInt32(expr, 16) * signFactor;
                         return v == 0 ? boxedZero : v;
                     }
                     else
                     {
-                        var v = Convert.ToInt64(expr) * signFactor;
+                        var v = Convert.ToInt64(expr, 16) * signFactor;
                         return v == 0 ? boxedZero : v;
                     }
                 }
                 catch (Exception ex)
                 {
-                    throw MakeReaderException($"Cannot represent numeric literal “{expr}” with a proper number type.",
-                        ex);
+                    throw MakeReaderException($"Cannot represent numeric literal “{expr}” with a proper number type.", ex);
                 }
             }
             else
