@@ -95,4 +95,65 @@ namespace Luaon
             }
         }
     }
+
+#if NETSTANDARD2_0
+    [Serializable]
+#endif
+    public class LuaTableReaderException : LuaonException
+    {
+
+        public LuaTableReaderException()
+        {
+        }
+
+        public LuaTableReaderException(string message) : this(message, null, null)
+        {
+        }
+
+        public LuaTableReaderException(string message, string path) : this(message, path, null)
+        {
+        }
+
+        public LuaTableReaderException(string message, Exception inner) : this(message, null, inner)
+        {
+        }
+
+        public LuaTableReaderException(string message, string path, Exception inner) : base(message)
+        {
+            Path = path;
+        }
+
+#if NETSTANDARD2_0
+        [SecurityCritical]
+        protected LuaTableReaderException(
+            SerializationInfo info,
+            StreamingContext context) : base(info, context)
+        {
+            Path = info.GetString("Path");
+        }
+
+        /// <inheritdoc />
+        public override void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            base.GetObjectData(info, context);
+            info.AddValue("Path", Path);
+        }
+#endif
+
+        /// <summary>
+        /// Gets the Lua property path where the exception happens.
+        /// </summary>
+        public virtual string Path { get; }
+
+        /// <inheritdoc />
+        public override string Message
+        {
+            get
+            {
+                if (!string.IsNullOrEmpty(Path))
+                    return base.Message + "\nPath: " + Path;
+                return base.Message;
+            }
+        }
+    }
 }

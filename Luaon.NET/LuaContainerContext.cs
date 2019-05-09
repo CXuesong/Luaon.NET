@@ -17,8 +17,13 @@ namespace Luaon
 
         public readonly LuaContainerType ContainerType;
 
-        // Key != null: Named field; Key == null: Indexed field.
+        // Key != null: Named field; Key == null && BoxedKey == null: Indexed field.
+        // This is used in Writer.
         public string Key;
+
+        // The effective value of the key, boxed as object.
+        // This is used in Reader.
+        public object BoxedKey;
 
         public bool KeyIsExpression;
 
@@ -28,6 +33,7 @@ namespace Luaon
         {
             ContainerType = containerType;
             Key = null;
+            BoxedKey = null;
             KeyIsExpression = true;
             CurrentIndex = 1;
         }
@@ -35,6 +41,8 @@ namespace Luaon
         /// <inheritdoc />
         public override string ToString()
         {
+            if (ContainerType == LuaContainerType.None)
+                return "<Root>";
             var sb = new StringBuilder();
             ToString(sb);
             return sb.ToString();
@@ -42,6 +50,15 @@ namespace Luaon
 
         private void ToString(StringBuilder sb)
         {
+            if (ContainerType == LuaContainerType.None)
+            {
+                sb.Append("<Root>");
+                return;
+            }
+            if (Key == null && BoxedKey != null)
+            {
+                Key = BoxedKey.ToString();
+            }
             if (Key == null)
             {
                 sb.Append('[');

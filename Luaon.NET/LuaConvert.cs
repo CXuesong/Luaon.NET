@@ -407,6 +407,17 @@ namespace Luaon
 
         #endregion
 
+        public static void WriteString(TextWriter writer, string value)
+        {
+            WriteEscapedString(value, StringDelimiterInfo.DoubleQuote, writer);
+        }
+
+        public static void WriteString(TextWriter writer, string value, string delimiter)
+        {
+            var delm = StringDelimiterInfo.FromStartDelimiter(delimiter);
+            WriteEscapedString(value, delm, writer);
+        }
+
         internal static void WriteEscapedString(string value, StringDelimiterInfo delimiter, TextWriter writer)
         {
             Debug.Assert(delimiter != null);
@@ -433,6 +444,9 @@ namespace Luaon
                 {
                     switch (c)
                     {
+                        case '\\':
+                            writer.Write("\\");
+                            break;
                         case '\a':
                             writer.Write("\\a");
                             break;
@@ -473,52 +487,93 @@ namespace Luaon
 
     internal sealed class StringDelimiterInfo : IEquatable<StringDelimiterInfo>
     {
-
-        private readonly int data;
-
         public static readonly StringDelimiterInfo SingleQuote = new StringDelimiterInfo(-1, "'", "'");
         public static readonly StringDelimiterInfo DoubleQuote = new StringDelimiterInfo(-2, "\"", "\"");
         public static readonly StringDelimiterInfo Brackets0 = new StringDelimiterInfo(0, "[[", "]]");
-        public static readonly StringDelimiterInfo Brackets1 = new StringDelimiterInfo(0, "[=[", "]=]");
-        public static readonly StringDelimiterInfo Brackets2 = new StringDelimiterInfo(0, "[==[", "]==]");
-        public static readonly StringDelimiterInfo Brackets3 = new StringDelimiterInfo(0, "[===[", "]===]");
-        public static readonly StringDelimiterInfo Brackets4 = new StringDelimiterInfo(0, "[====[", "]====]");
+        public static readonly StringDelimiterInfo Brackets1 = new StringDelimiterInfo(1, "[=[", "]=]");
+        public static readonly StringDelimiterInfo Brackets2 = new StringDelimiterInfo(2, "[==[", "]==]");
+        public static readonly StringDelimiterInfo Brackets3 = new StringDelimiterInfo(3, "[===[", "]===]");
+        public static readonly StringDelimiterInfo Brackets4 = new StringDelimiterInfo(4, "[====[", "]====]");
+        public static readonly StringDelimiterInfo Brackets5 = new StringDelimiterInfo(5, "[=====[", "]=====]");
+        public static readonly StringDelimiterInfo Brackets6 = new StringDelimiterInfo(6, "[======[", "]======]");
+        public static readonly StringDelimiterInfo Brackets7 = new StringDelimiterInfo(7, "[=======[", "]=======]");
+        public static readonly StringDelimiterInfo Brackets8 = new StringDelimiterInfo(8, "[========[", "]========]");
+
+        private static readonly StringDelimiterInfo[] bracketsByLevel =
+        {
+            Brackets0,
+            Brackets1,
+            Brackets2,
+            Brackets3,
+            Brackets4,
+            Brackets5,
+            Brackets6,
+            Brackets7,
+            Brackets8,
+        };
 
         public static StringDelimiterInfo FromStartDelimiter(string delimiter)
         {
             if (delimiter == null) throw new ArgumentNullException(nameof(delimiter));
             if (delimiter.Length == 0) goto INVALID_DELIMITER;
-            switch (delimiter)
+            if (delimiter.Length <= 10)
             {
-                case "'": return new StringDelimiterInfo(-1, "'", "'");
-                case "\"": return new StringDelimiterInfo(-2, "\"", "\"");
-                case "[[": return new StringDelimiterInfo(0, "[[", "]]");
-                case "[=[": return new StringDelimiterInfo(1, "[=[", "]=]");
-                case "[==[": return new StringDelimiterInfo(2, "[==[", "]==]");
-                case "[===[": return new StringDelimiterInfo(3, "[===[", "]===]");
-                case "[====[": return new StringDelimiterInfo(4, "[====[", "]====]");
-                case "[=====[": return new StringDelimiterInfo(5, "[=====[", "]=====]");
-                case "[======[": return new StringDelimiterInfo(6, "[======[", "]======]");
-                case "[=======[": return new StringDelimiterInfo(7, "[=======[", "]=======]");
-                case "[========[": return new StringDelimiterInfo(8, "[========[", "]========]");
-                default:
-                    if (delimiter[0] != '[') goto INVALID_DELIMITER;
-                    if (delimiter[delimiter.Length - 1] != '[') goto INVALID_DELIMITER;
-                    for (int i = 1; i < delimiter.Length - 1; i++) if (delimiter[i] != '=') goto INVALID_DELIMITER;
-                    var sb = new StringBuilder("]", delimiter.Length);
-                    sb.Append('=', delimiter.Length - 2);
-                    sb.Append(']');
-                    return new StringDelimiterInfo(delimiter.Length - 2, delimiter, sb.ToString());
+                switch (delimiter)
+                {
+                    case "'": return SingleQuote;
+                    case "\"": return DoubleQuote;
+                    case "[[": return Brackets0;
+                    case "[=[": return Brackets1;
+                    case "[==[": return Brackets2;
+                    case "[===[": return Brackets3;
+                    case "[====[": return Brackets4;
+                    case "[=====[": return Brackets5;
+                    case "[======[": return Brackets6;
+                    case "[=======[": return Brackets7;
+                    case "[========[": return Brackets8;
+                    default: goto INVALID_DELIMITER;
+                }
             }
-            INVALID_DELIMITER:
+            if (delimiter[0] != '[') goto INVALID_DELIMITER;
+            if (delimiter[delimiter.Length - 1] != '[') goto INVALID_DELIMITER;
+            for (int i = 1; i < delimiter.Length - 1; i++)
+                if (delimiter[i] != '=')
+                    goto INVALID_DELIMITER;
+            var sb = new StringBuilder("]", delimiter.Length);
+            sb.Append('=', delimiter.Length - 2);
+            sb.Append(']');
+            return new StringDelimiterInfo(delimiter.Length - 2, delimiter, sb.ToString());
+        INVALID_DELIMITER:
             throw new ArgumentException("Invalid string delimiter.", nameof(delimiter));
+        }
+
+        public static StringDelimiterInfo FromBracketLevel(int bracketLevel)
+        {
+            switch (bracketLevel)
+            {
+                case -2: return DoubleQuote;
+                case -1: return SingleQuote;
+                default:
+                    if (bracketLevel < 0)
+                        throw new ArgumentException("Invalid bracket level.", nameof(bracketLevel));
+                    if (bracketLevel < bracketsByLevel.Length)
+                        return bracketsByLevel[bracketLevel];
+                    var sb = new StringBuilder("[", bracketLevel + 2);
+                    sb.Append('=', bracketLevel);
+                    sb.Append('[');
+                    var startDelm = sb.ToString();
+                    sb[0] = ']';
+                    sb[sb.Length - 1] = ']';
+                    var endDelim = sb.ToString();
+                    return new StringDelimiterInfo(bracketLevel, startDelm, endDelim);
+            }
         }
 
         private StringDelimiterInfo(int data, string startDelimiter, string endDelimiter)
         {
             Debug.Assert(startDelimiter != null);
             Debug.Assert(endDelimiter != null);
-            this.data = data;
+            this.BracketLevel = data;
             StartDelimiter = startDelimiter;
             EndDelimiter = endDelimiter;
         }
@@ -527,20 +582,20 @@ namespace Luaon
 
         public string EndDelimiter { get; }
 
-        public bool IsSingleQuote => data == -1;
+        public bool IsSingleQuote => BracketLevel == -1;
 
-        public bool IsDoubleQuote => data == -2;
+        public bool IsDoubleQuote => BracketLevel == -2;
 
-        public bool IsBracket => data >= 0;
+        public bool IsBracket => BracketLevel >= 0;
 
-        public int BracketLevel => data;
+        public int BracketLevel { get; }
 
         /// <inheritdoc />
         public bool Equals(StringDelimiterInfo other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return data == other.data;
+            return BracketLevel == other.BracketLevel;
         }
 
         /// <inheritdoc />
@@ -554,7 +609,7 @@ namespace Luaon
         /// <inheritdoc />
         public override int GetHashCode()
         {
-            return data;
+            return BracketLevel;
         }
 
         public static bool operator ==(StringDelimiterInfo left, StringDelimiterInfo right)

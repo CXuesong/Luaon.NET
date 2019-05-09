@@ -197,6 +197,7 @@ namespace Luaon.Json
             writer.Write(LuaConvert.Nil);
         }
 
+        /// <inheritdoc />
         public override void WriteUndefined()
         {
             throw new NotSupportedException();
@@ -218,7 +219,7 @@ namespace Luaon.Json
             if (value == null)
                 writer.Write(LuaConvert.Nil);
             else
-                writer.Write(LuaConvert.ToString(value));
+                LuaConvert.WriteString(writer, value);
         }
 
         /// <inheritdoc />

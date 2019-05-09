@@ -15,7 +15,7 @@ namespace Luaon
 
         private enum State
         {
-            Unknown = 0,    // Determined by context (e.g. When leaving the current sope)
+            Unknown = 0,    // Determined by context (e.g. When leaving the current scope)
             Start = 1,      // outside of table
             TableStart,     // At the beginning of the table {}
             FieldStart,     // At the middle of the table, but immediately after a field separator
@@ -41,12 +41,13 @@ namespace Luaon
         private int _Indentation;
         private int _MaxUnquotedNameLength = 64;
         private char _IndentChar;
-        private char[] currentIdentation;
-        private string currentIdentationNewLine;
+        private char[] currentIndentation;
+        private string currentIndentationNewLine;
 
         // NextState[State][Token]
         private static readonly State[][] NextStateTable =
         {
+            // @formatter:off
             /*                          TableStart        TableEnd        KeyStart         KeyEnd       Literal*/
             /* Unknown      */ new[] {State.Error,      State.Error,    State.Error,    State.Error,    State.Error},
             /* Start        */ new[] {State.TableStart, State.Error,    State.Error,    State.Error,    State.Start},
@@ -56,6 +57,7 @@ namespace Luaon
             /* Key          */ new[] {State.Error,      State.Error,    State.Error,    State.KeyEnd,   State.Error},
             /* KeyEnd       */ new[] {State.TableStart, State.Error,    State.Error,    State.Error,    State.FieldStart},
             /* Error        */ new[] {State.Error,      State.Error,    State.Error,    State.Error,    State.Error},
+            // @formatter:on
         };
 
         public LuaTableTextWriter(TextWriter writer)
@@ -120,7 +122,7 @@ namespace Luaon
                 if (value < 0) throw new ArgumentOutOfRangeException(nameof(value));
                 if (_Indentation != value)
                 {
-                    currentIdentation = null;
+                    currentIndentation = null;
                     _Indentation = value;
                 }
             }
@@ -137,7 +139,7 @@ namespace Luaon
             {
                 if (_IndentChar != value)
                 {
-                    currentIdentation = null;
+                    currentIndentation = null;
                     _IndentChar = value;
                 }
             }
@@ -194,7 +196,7 @@ namespace Luaon
             return context.ContainerType;
         }
 
-        internal string CurrentPath => LuaContainerContext.ToString(contextStack, currentContext);
+        private string CurrentPath => LuaContainerContext.ToString(contextStack, currentContext);
 
         private void AssertContainerType(LuaContainerType type)
         {
@@ -334,17 +336,16 @@ namespace Luaon
         protected virtual void WriteIndent()
         {
             var indentCount = contextStack.Count * Indentation;
-            if (currentIdentation == null || currentIdentation.Length - currentIdentationNewLine.Length < indentCount)
+            if (currentIndentation == null || currentIndentation.Length - currentIndentationNewLine.Length < indentCount)
             {
                 var newLine = Writer.NewLine;
                 var chars = new char[newLine.Length + indentCount];
                 newLine.CopyTo(0, chars, 0, newLine.Length);
                 for (int i = newLine.Length; i < chars.Length; i++) chars[i] = _IndentChar;
-                currentIdentation = chars;
-                currentIdentationNewLine = newLine;
+                currentIndentation = chars;
+                currentIndentationNewLine = newLine;
             }
-
-            Writer.Write(currentIdentation, 0, currentIdentationNewLine.Length + indentCount);
+            Writer.Write(currentIndentation, 0, currentIndentationNewLine.Length + indentCount);
         }
 
         private void DelimitLastValue(Token nextToken)
