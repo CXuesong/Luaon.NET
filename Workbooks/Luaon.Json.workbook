@@ -6,9 +6,9 @@ platforms:
 - DotNetCore
 packages:
 - id: CXuesong.Luaon
-  version: 0.1.1
+  version: 0.2.2
 - id: CXuesong.Luaon.Json
-  version: 0.1.0
+  version: 0.2.1
 ---
 
 ```csharp

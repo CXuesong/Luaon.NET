@@ -1,6 +1,6 @@
 # LUAON.NET
 
-Writing LUA table expressions becomes easy. It's LUA Object Notation (or LUA Table Notation).
+Reading / writing LUA table expressions becomes easy. It's LUA Object Notation (or LUA Table Notation).
 
 | Package                                  | Status                                   |
 | ---------------------------------------- | ---------------------------------------- |
@@ -45,7 +45,9 @@ table.Add("Key with space", 789);
 table.Add("Item2");
 table.Add(100, "Value100");
 table.Add("ChildTable", new LTable(1, 2, 3, 4, 5));
-table.ToString();
+var luaExpr = table.ToString();
+var table2 = LToken.Parse(luaExpr);
+luaExpr
 ```
 
 ```lua
@@ -75,7 +77,7 @@ table[2]
 "Item2"
 ```
 
-And a Lua table writer
+And a Lua table writer.
 
 ```c#
 using System.IO;
@@ -106,6 +108,19 @@ using (var sw = new StringWriter())
   "Value1",
   "Value2",
   "Value3"
+}
+```
+
+There is also a reader now.
+
+```c#
+using (var sr = new StringReader("{a = 10, ['b'] = {100, 200, k=20} }"))
+using (var lr = new LuaTableTextReader(sr))
+{
+    while (lr.Read() != LuaTableReaderToken.None)
+    {
+        Console.WriteLine("{0}: {1}, {2}", lr.CurrentPath, lr.CurrentToken, lr.CurrentValue);
+    }
 }
 ```
 
@@ -155,7 +170,3 @@ using (var sw = new StringWriter())
   Age = 132
 }
 ```
-
-## As for table readers
-
-It's not my priority yet XD If you want it, consider opening an issue or PR to let me know ^ _ ^

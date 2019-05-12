@@ -6,9 +6,9 @@ platforms:
 - DotNetCore
 packages:
 - id: CXuesong.Luaon
-  version: 0.1.1
+  version: 0.2.2
 - id: CXuesong.Luaon.Json
-  version: 0.1.0
+  version: 0.2.1
 ---
 
 ```csharp
@@ -48,7 +48,17 @@ table.Add("Key with space", 789);
 table.Add("Item4");
 table.Add(100, "Value100");
 table.Add("ChildTable", new LTable(1, 2, 3, 4, 5));
-table.ToString();
+var luaExpr = table.ToString();
+```
+
+You can parse Lua table expression with \`LToken.Parse\`. Note it only supports simple expressions such as tables and literals. This is somewhat similar to JSON.
+
+```csharp
+var table2 = LToken.Parse(luaExpr)
+```
+
+```csharp
+LTokenEqualityComparer.Instance.Equals(table, table2)
 ```
 
 ```csharp
@@ -61,10 +71,11 @@ table.ToString();
 (int)table["Key2"] * 100
 ```
 
-For advanced users, you can operate on `LuaTableTextWriter` directly. But the API of this class might be subject to some major changes. Anyway, I’m making it feel like `JsonTextWriter`, except that for now it does not provide auto-completion. You need to close the table expression manually.
+For advanced users, you can operate on `LuaTableTextWriter` directly. But the API of this class might be subject to some major changes. Anyway, I’m making it feel like `JsonTextWriter`, except that for now it does not provide auto-completion. You need to close the table expression with \`WriteEndTable\` manually.
 
 ```csharp
 using System.IO;
+string tableExpr;
 using (var sw = new StringWriter())
 {
     using (var lw = new LuaTableTextWriter(sw) {
@@ -89,6 +100,20 @@ using (var sw = new StringWriter())
         
         lw.WriteEndTable();
     }
-    return sw.ToString();
+    tableExpr = sw.ToString();
+}
+tableExpr
+```
+
+There is also a \`LuaTableTextReader\` for you to read Lua table tokens.
+
+```csharp
+using (var sr = new StringReader("{a = 10, ['b'] = {100, 200, k=20} }"))
+using (var lr = new LuaTableTextReader(sr))
+{
+    while (lr.Read() != LuaTableReaderToken.None)
+    {
+        Console.WriteLine("{0}: {1}, {2}", lr.CurrentPath, lr.CurrentToken, lr.CurrentValue);
+    }
 }
 ```
