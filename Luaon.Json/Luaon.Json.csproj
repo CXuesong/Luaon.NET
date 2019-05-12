@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard1.1;netstandard2.0</TargetFrameworks>
     <PackageId>CXuesong.Luaon.Json</PackageId>
-    <Version>0.2.0</Version>
+    <Version>0.2.1</Version>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <Copyright>Copyright (C) CXuesong 2019</Copyright>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
