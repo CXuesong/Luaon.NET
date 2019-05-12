@@ -102,5 +102,29 @@ namespace XUnitTestProject1.Tests
             }
         }
 
+        [Fact]
+        public void WriteOutsideTableTest()
+        {
+            using (var sw = new StringWriter())
+            using (var tw = new LuaTableTextWriter(sw))
+            {
+                tw.WriteLiteral(123);
+
+                tw.WriteStartKey();
+                tw.WriteLiteral(2);
+                tw.WriteEndKey();
+
+                tw.WriteLiteral(456);
+
+                tw.WriteKey("key");
+                tw.WriteLiteral("value");
+
+                tw.WriteLiteral("last");
+
+                tw.Flush();
+                Assert.Equal("123,[2]=456,key=\"value\",\"last\"", sw.ToString());
+            }
+        }
+
     }
 }

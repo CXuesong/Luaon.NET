@@ -50,7 +50,7 @@ namespace Luaon
             // @formatter:off
             /*                          TableStart        TableEnd        KeyStart         KeyEnd       Literal*/
             /* Unknown      */ new[] {State.Error,      State.Error,    State.Error,    State.Error,    State.Error},
-            /* Start        */ new[] {State.TableStart, State.Error,    State.Error,    State.Error,    State.Start},
+            /* Start        */ new[] {State.TableStart, State.Error,    State.KeyStart, State.Error,    State.FieldStart},
             /* TableStart   */ new[] {State.TableStart, State.Unknown,  State.KeyStart, State.Error,    State.FieldStart},
             /* FieldStart   */ new[] {State.TableStart, State.Unknown,  State.KeyStart, State.Error,    State.FieldStart},
             /* KeyStart     */ new[] {State.TableStart, State.Error,    State.Error,    State.Error,    State.Key},
@@ -231,7 +231,6 @@ namespace Luaon
         /// </summary>
         public virtual void WriteStartKey()
         {
-            AssertContainerType(LuaContainerType.Table);
             DelimitLastValue(Token.KeyStart);
             Writer.Write('[');
             Push(LuaContainerType.Key);
@@ -263,7 +262,6 @@ namespace Luaon
             if (key == null) throw new ArgumentNullException(nameof(key));
             if (key.Length <= MaxUnquotedNameLength && LuaConvert.IsValidIdentifier(key))
             {
-                AssertContainerType(LuaContainerType.Table);
                 DelimitLastValue(Token.KeyStart);
                 GotoNextState(Token.Literal);
                 Writer.Write(key);
