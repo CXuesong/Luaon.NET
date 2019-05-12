@@ -50,11 +50,6 @@ namespace Luaon
 
         private void ToString(StringBuilder sb)
         {
-            if (ContainerType == LuaContainerType.None)
-            {
-                sb.Append("<Root>");
-                return;
-            }
             if (Key == null && BoxedKey != null)
             {
                 Key = BoxedKey.ToString();

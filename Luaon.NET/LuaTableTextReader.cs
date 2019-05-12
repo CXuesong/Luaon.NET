@@ -423,7 +423,6 @@ namespace Luaon
                     var key = currentContext.BoxedKey;
                     Pop();
                     currentContext.BoxedKey = key;
-                    currentContext.KeyIsExpression = false;
                     Consume();
                     CurrentValue = key == NilPlaceholder.Instance ? null : key;
                     return CurrentToken = LuaTableReaderToken.Key;
@@ -460,7 +459,6 @@ namespace Luaon
                 CurrentValue = o;
                 // We keep using BoxedKey instead of Key in Reader.
                 currentContext.BoxedKey = (string)o;
-                currentContext.KeyIsExpression = true;
                 return CurrentToken = LuaTableReaderToken.Key;
             }
             throw MakeUnexpectedCharacterException(c);
