@@ -36,9 +36,15 @@ namespace Luaon.Linq
                 reader.Read();
             SkipComments(reader);
             AssertReaderToken(reader, LuaTableReaderToken.Value);
-            var v = new LValue(reader.CurrentValue);
+            var rawValue = reader.CurrentValue;
             reader.Read();
-            return v;
+            if (rawValue == null)
+                return Nil;
+            if (rawValue is bool b)
+                return b ? True : False;
+            if (rawValue is int i)
+                return i;
+            return new LValue(rawValue);
         }
 
         public LValue(LValue other)
@@ -272,6 +278,20 @@ namespace Luaon.Linq
         }
 
         /// <inheritdoc />
+        internal override int GetDeepHashCode()
+        {
+            var hash = (int)TokenType;
+            if (Value != null) hash = Value.GetHashCode();
+            return hash;
+        }
+
+        /// <inheritdoc />
+        internal override bool DeepEquals(LToken other)
+        {
+            return Equals(other);
+        }
+
+        /// <inheritdoc />
         public override LToken DeepClone()
         {
             return new LValue(this);
@@ -284,8 +304,22 @@ namespace Luaon.Linq
             if (ReferenceEquals(this, other)) return true;
             if (TokenType != other.TokenType) return false;
             if (Equals(Value, other.Value)) return true;
-            if (TokenType == LTokenType.Integer && Value.GetType() != other.Value.GetType())
-                return Convert.ToDecimal(Value) == Convert.ToDecimal(other.Value);
+            if (TokenType == LTokenType.Integer)
+            {
+                var t1 = Value.GetType();
+                var t2 = other.Value.GetType();
+                if (t1 != t2)
+                {
+                    if (t1 == typeof(ulong) || t2 == typeof(ulong) || t1 == typeof(decimal) || t2 == typeof(decimal))
+                    {
+                        return Convert.ToDecimal(Value) == Convert.ToDecimal(other.Value);
+                    }
+                    else
+                    {
+                        return Convert.ToInt64(Value) == Convert.ToInt64(other.Value);
+                    }
+                }
+            }
             return false;
         }
 

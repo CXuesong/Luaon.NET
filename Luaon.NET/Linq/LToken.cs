@@ -5,9 +5,19 @@ using System.Text;
 
 namespace Luaon.Linq
 {
+    /// <summary>
+    /// Represents a token in the Lua table expression.
+    /// </summary>
     public abstract class LToken
     {
 
+        /// <summary>
+        /// Loads next <see cref="LToken"/> from the specified <see cref="LuaTableTextReader"/>.
+        /// </summary>
+        /// <param name="reader">The reader from which to load the next <see cref="LToken"/>.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="reader"/> is <c>null</c>.</exception>
+        /// <exception cref="LuaTableReaderException">There are unexpected input in the <paramref name="reader"/>.</exception>
+        /// <returns>The loaded Lua token.</returns>
         public static LToken Load(LuaTableTextReader reader)
         {
             if (reader == null) throw new ArgumentNullException(nameof(reader));
@@ -28,8 +38,16 @@ namespace Luaon.Linq
             }
         }
 
+        /// <summary>
+        /// Parses the <see cref="LToken"/> from the specified Lua expression.
+        /// </summary>
+        /// <param name="expression">The Lua expression to be parsed.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="expression"/> is <c>null</c>.</exception>
+        /// <exception cref="LuaTableReaderException"><paramref name="expression"/> is empty or invalid; or it contains extra content after the first parsed token.</exception>
+        /// <returns>The loaded Lua token.</returns>
         public static LToken Parse(string expression)
         {
+            if (expression == null) throw new ArgumentNullException(nameof(expression));
             using (var reader = new StringReader(expression))
             using (var lreader = new LuaTableTextReader(reader))
             {
@@ -195,6 +213,18 @@ namespace Luaon.Linq
 
         #endregion
 
+        internal abstract int GetDeepHashCode();
+
+        internal abstract bool DeepEquals(LToken other);
+
+        public static bool DeepEquals(LToken x, LToken y)
+        {
+            if (x == null || y == null) return x == null && y == null;
+            return x.DeepEquals(y);
+        }
+
+        #region Accessors
+
         /// <summary>
         /// Gets/sets the child token associated with the specified key.
         /// </summary>
@@ -227,6 +257,8 @@ namespace Luaon.Linq
             get => throw new NotSupportedException($"Cannot access child token of {GetType()}.");
             set => throw new NotSupportedException($"Cannot access child token of {GetType()}.");
         }
+
+        #endregion
 
     }
 

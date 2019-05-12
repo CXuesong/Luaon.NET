@@ -105,9 +105,26 @@ namespace Luaon.Linq
         }
 
         /// <inheritdoc />
+        internal override int GetDeepHashCode()
+        {
+            int hash = Value.GetDeepHashCode();
+            if (Name != null) hash ^= Name.GetHashCode();
+            return hash;
+        }
+
+        /// <inheritdoc />
+        internal override bool DeepEquals(LToken other)
+        {
+            var y = other as LField;
+            if (y == null) return false;
+            return DeepEquals(Name, y.Name) && DeepEquals(_Value, y._Value);
+        }
+
+        /// <inheritdoc />
         public override LToken DeepClone()
         {
             return new LField(Name, Value);
         }
+
     }
 }

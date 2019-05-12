@@ -278,6 +278,33 @@ namespace Luaon.Linq
         }
 
         /// <inheritdoc />
+        internal override int GetDeepHashCode()
+        {
+            int hash = 0;
+            foreach (var field in store)
+            {
+                hash = unchecked(hash * 13 + field.GetDeepHashCode());
+            }
+            return hash;
+        }
+
+        /// <inheritdoc />
+        internal override bool DeepEquals(LToken other)
+        {
+            var y = other as LTable;
+            if (y == null) return false;
+            if (ReferenceEquals(this, y)) return true; 
+            if (store.Count != y.store.Count) return false;
+            var count = store.Count;
+            for (int i = 0; i < count; i++)
+            {
+                if (!DeepEquals(store[i], y.store[i]))
+                    return false;
+            }
+            return true;
+        }
+
+        /// <inheritdoc />
         public override LToken DeepClone()
         {
             var table = new LTable(store.Select(t => t.DeepClone()));

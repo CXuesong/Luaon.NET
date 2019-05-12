@@ -66,15 +66,25 @@ namespace XUnitTestProject1.Tests
 }", table.ToString());
         }
 
+        private void AssertTokenEquals(LToken expected, LToken actual)
+        {
+            Assert.Equal(expected, actual, LTokenEqualityComparer.Instance);
+        }
+
+        private void AssertTokenEquals(LToken expected, string actual)
+        {
+            Assert.Equal(expected, LToken.Parse(actual), LTokenEqualityComparer.Instance);
+        }
+
         [Fact]
         public void LTokenParseTest()
         {
-            Assert.Equal(LValue.True, LToken.Parse("true"));
-            Assert.Equal(LValue.False, LToken.Parse("--content\nfalse\n--content"));
-            Assert.Equal(LValue.Nil, LToken.Parse("nil"));
-            Assert.Equal(new LTable { 10, 20, 30 }, LToken.Parse("{10, 20, 30}"));
-            Assert.Equal(new LTable { 10, 20, 30, new LTable { 40, 50 } }, LToken.Parse("{10, 20, 30, {40, 50}}"));
-            Assert.Equal(new LTable
+            AssertTokenEquals(LValue.True, "true");
+            AssertTokenEquals(LValue.False, "--content\nfalse\n--content");
+            AssertTokenEquals(LValue.Nil, "nil");
+            AssertTokenEquals(new LTable { 10, 20, 30 }, "{10, 20, 30}");
+            AssertTokenEquals(new LTable { 10, 20, 30, new LTable { 40, 50 } }, "{10, 20, 30, {40, 50}}");
+            AssertTokenEquals(new LTable
             {
                 {"Test1", 1},
                 2,
@@ -83,7 +93,7 @@ namespace XUnitTestProject1.Tests
                 {20, 5},
                 {true, "6"},
                 {"Child", new LTable(1, 2, 3, 4, 5)}
-            }, LToken.Parse(@"{
+            }, @"{
   Test1 = 1,
   2,
   Test2 = 3,
@@ -97,7 +107,7 @@ namespace XUnitTestProject1.Tests
     4,
     5
   }
-}"));
+}");
         }
 
     }
