@@ -1,26 +1,29 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>netstandard1.1;netstandard2.0</TargetFrameworks>
     <PackageId>CXuesong.Luaon.Json</PackageId>
-    <Version>0.1.0</Version>
+    <Version>0.2.0</Version>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <Copyright>Copyright (C) CXuesong 2018</Copyright>
+    <Copyright>Copyright (C) CXuesong 2019</Copyright>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Authors>CXuesong</Authors>
     <Company />
     <Product />
-    <Description>Newtonsoft.Json adapter for Luaon.NET.</Description>
-    <PackageLicenseUrl>http://www.apache.org/licenses/LICENSE-2.0</PackageLicenseUrl>
+    <Description>Newtonsoft.Json writer adapter for Luaon.NET.</Description>
     <PackageProjectUrl>https://github.com/CXuesong/Luaon.NET</PackageProjectUrl>
     <RepositoryUrl>https://github.com/CXuesong/Luaon.NET</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>lua lua-table json</PackageTags>
     <PackageReleaseNotes>See https://github.com/CXuesong/Luaon.NET/releases.</PackageReleaseNotes>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta2-18618-05" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup>
