@@ -17,7 +17,7 @@ namespace XUnitTestProject1.Tests
         }
 
         [Fact]
-        public void LTableTest()
+        public void LTableToStringTest()
         {
             var table = new LTable
             {
@@ -36,13 +36,13 @@ namespace XUnitTestProject1.Tests
             Assert.Equal(4.5, table[2]);
             Assert.Equal(5, table[20]);
             Assert.Equal("6", table[true]);
-            Assert.Equal(1, (int)table["Test1"]);
-            Assert.Equal(2, (int)table[1]);
-            Assert.Equal(3, (int)table["Test2"]);
-            Assert.Equal(4, (int)table[2]);
-            Assert.Equal("5", (string)table[20]);
-            Assert.Equal(6, (int)table[true]);
-            var childTable = (LTable)table["Child"];
+            Assert.Equal(1, (int) table["Test1"]);
+            Assert.Equal(2, (int) table[1]);
+            Assert.Equal(3, (int) table["Test2"]);
+            Assert.Equal(4, (int) table[2]);
+            Assert.Equal("5", (string) table[20]);
+            Assert.Equal(6, (int) table[true]);
+            var childTable = (LTable) table["Child"];
             Assert.Equal(5, childTable.Count);
             Assert.Equal(1, table["Child"][1]);
             Assert.Equal(2, table["Child"][2]);
@@ -64,6 +64,40 @@ namespace XUnitTestProject1.Tests
     5
   }
 }", table.ToString());
+        }
+
+        [Fact]
+        public void LTokenParseTest()
+        {
+            Assert.Equal(LValue.True, LToken.Parse("true"));
+            Assert.Equal(LValue.False, LToken.Parse("--content\nfalse\n--content"));
+            Assert.Equal(LValue.Nil, LToken.Parse("nil"));
+            Assert.Equal(new LTable { 10, 20, 30 }, LToken.Parse("{10, 20, 30}"));
+            Assert.Equal(new LTable { 10, 20, 30, new LTable { 40, 50 } }, LToken.Parse("{10, 20, 30, {40, 50}}"));
+            Assert.Equal(new LTable
+            {
+                {"Test1", 1},
+                2,
+                {"Test2", 3},
+                4.5,
+                {20, 5},
+                {true, "6"},
+                {"Child", new LTable(1, 2, 3, 4, 5)}
+            }, LToken.Parse(@"{
+  Test1 = 1,
+  2,
+  Test2 = 3,
+  4.5,
+  [20] = 5,
+  [true] = ""6"",
+  Child = {
+    1,
+    2,
+    3,
+    4,
+    5
+  }
+}"));
         }
 
     }

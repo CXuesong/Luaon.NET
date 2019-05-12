@@ -8,6 +8,63 @@ namespace Luaon.Linq
     public abstract class LToken
     {
 
+        public static LToken Load(LuaTableTextReader reader)
+        {
+            if (reader == null) throw new ArgumentNullException(nameof(reader));
+            if (reader.CurrentToken == LuaTableReaderToken.None)
+                reader.Read();
+            SkipComments(reader);
+            switch (reader.CurrentToken)
+            {
+                case LuaTableReaderToken.None:
+                case LuaTableReaderToken.TableStart:
+                    return LTable.Load(reader);
+                case LuaTableReaderToken.Key:
+                    return LField.Load(reader);
+                case LuaTableReaderToken.Value:
+                    return LValue.Load(reader);
+                default:
+                    throw MakeUnexpectedTokenException(reader);
+            }
+        }
+
+        public static LToken Parse(string expression)
+        {
+            using (var reader = new StringReader(expression))
+            using (var lreader = new LuaTableTextReader(reader))
+            {
+                var token = Load(lreader);
+                SkipComments(lreader);
+                if (lreader.CurrentToken != LuaTableReaderToken.None)
+                    throw new LuaTableReaderException($"Detected extra content after parsing complete: {lreader.CurrentToken}.",
+                        lreader.CurrentPath);
+                return token;
+            }
+        }
+
+        protected static void SkipComments(LuaTableTextReader reader)
+        {
+            while (reader.CurrentToken == LuaTableReaderToken.Comment)
+                reader.Read();
+        }
+
+        protected static void AssertReaderToken(LuaTableTextReader reader, LuaTableReaderToken expectedToken)
+        {
+            if (reader.CurrentToken != expectedToken)
+                throw MakeUnexpectedTokenException(reader, expectedToken);
+        }
+
+        protected static LuaTableReaderException MakeUnexpectedTokenException(LuaTableTextReader reader,
+            LuaTableReaderToken expectedToken = LuaTableReaderToken.None)
+        {
+            if (reader.CurrentToken == LuaTableReaderToken.None)
+                return new LuaTableReaderException("Unexpected end of input.", reader.CurrentPath);
+            var message = $"Unexpected Lua token: {reader.CurrentToken}.";
+            if (expectedToken != LuaTableReaderToken.None)
+                message += $" Expected: {expectedToken}.";
+            return new LuaTableReaderException(message, reader.CurrentPath);
+        }
+
         /// <summary>
         /// Gets the token node type.
         /// </summary>
@@ -33,7 +90,7 @@ namespace Luaon.Linq
         {
             using (var writer = new StringWriter())
             {
-                using (var lw = new LuaTableTextWriter(writer) { CloseWriter = false, Formatting = formatting})
+                using (var lw = new LuaTableTextWriter(writer) { CloseWriter = false, Formatting = formatting })
                 {
                     WriteTo(lw);
                 }
@@ -55,60 +112,60 @@ namespace Luaon.Linq
 
         public static explicit operator double(LToken value)
         {
-            return (double)(LValue)value;
+            return (double) (LValue) value;
         }
 
         public static explicit operator double?(LToken value)
         {
             if (value == null || value.TokenType == LTokenType.Nil) return null;
-            return (double)(LValue)value;
+            return (double) (LValue) value;
         }
 
         public static explicit operator float(LToken value)
         {
-            return (float)(double)(LValue)value;
+            return (float) (double) (LValue) value;
         }
 
         public static explicit operator float?(LToken value)
         {
-            return (float?)(double?)value;
+            return (float?) (double?) value;
         }
 
         public static explicit operator long(LToken value)
         {
-            return (long)(LValue)value;
+            return (long) (LValue) value;
         }
 
         public static explicit operator long?(LToken value)
         {
             if (value.TokenType == LTokenType.Nil) return null;
-            return (long)(LValue)value;
+            return (long) (LValue) value;
         }
 
         public static explicit operator int(LToken value)
         {
-            return (int)(long)value;
+            return (int) (long) value;
         }
 
         public static explicit operator int?(LToken value)
         {
-            return (int?)(long?)value;
+            return (int?) (long?) value;
         }
 
         public static explicit operator bool(LToken value)
         {
-            return (bool)(LValue)value;
+            return (bool) (LValue) value;
         }
 
         public static explicit operator bool?(LToken value)
         {
             if (value.TokenType == LTokenType.Nil) return null;
-            return (bool)value;
+            return (bool) value;
         }
 
         public static explicit operator string(LToken value)
         {
-            return (string)(LValue)value;
+            return (string) (LValue) value;
         }
 
         public static implicit operator LToken(bool value)

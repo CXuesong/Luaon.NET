@@ -29,6 +29,18 @@ namespace Luaon.Linq
         /// </summary>
         public static LValue False { get; } = new LValue(false);
 
+        public new static LValue Load(LuaTableTextReader reader)
+        {
+            if (reader == null) throw new ArgumentNullException(nameof(reader));
+            if (reader.CurrentToken == LuaTableReaderToken.None)
+                reader.Read();
+            SkipComments(reader);
+            AssertReaderToken(reader, LuaTableReaderToken.Value);
+            var v = new LValue(reader.CurrentValue);
+            reader.Read();
+            return v;
+        }
+
         public LValue(LValue other)
         {
             if (other == null) throw new ArgumentNullException(nameof(other));
@@ -97,19 +109,19 @@ namespace Luaon.Linq
                     TokenType = LTokenType.Boolean;
                     break;
                 case byte v:
-                    this.Value = (int)v;
+                    this.Value = (int) v;
                     TokenType = LTokenType.Integer;
                     break;
                 case sbyte v:
-                    this.Value = (int)v;
+                    this.Value = (int) v;
                     TokenType = LTokenType.Integer;
                     break;
                 case short v:
-                    this.Value = (int)v;
+                    this.Value = (int) v;
                     TokenType = LTokenType.Integer;
                     break;
                 case ushort v:
-                    this.Value = (int)v;
+                    this.Value = (int) v;
                     TokenType = LTokenType.Integer;
                     break;
                 case int v:
@@ -283,7 +295,7 @@ namespace Luaon.Linq
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
-            return Equals((LValue)obj);
+            return Equals((LValue) obj);
         }
 
         /// <inheritdoc />

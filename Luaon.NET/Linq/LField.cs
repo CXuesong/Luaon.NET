@@ -7,7 +7,25 @@ namespace Luaon.Linq
 {
     public class LField : LToken
     {
+
         private LToken _Value;
+
+        public new static LField Load(LuaTableTextReader reader)
+        {
+            if (reader == null) throw new ArgumentNullException(nameof(reader));
+            if (reader.CurrentToken == LuaTableReaderToken.None)
+                reader.Read();
+            SkipComments(reader);
+            LValue key = null;
+            if (reader.CurrentToken == LuaTableReaderToken.Key)
+            {
+                key = new LValue(reader.CurrentValue);
+                reader.Read();
+                SkipComments(reader);
+            }
+            LToken value = LToken.Load(reader);
+            return new LField(key, value);
+        }
 
         /// <summary>
         /// Initializes a new positional Lua table field with the specified name and value.

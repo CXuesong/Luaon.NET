@@ -16,6 +16,29 @@ namespace Luaon.Linq
 
         private readonly LTableStore store = new LTableStore();
 
+        public new static LTable Load(LuaTableTextReader reader)
+        {
+            if (reader == null) throw new ArgumentNullException(nameof(reader));
+            if (reader.CurrentToken == LuaTableReaderToken.None)
+                reader.Read();
+            SkipComments(reader);
+            AssertReaderToken(reader, LuaTableReaderToken.TableStart);
+            // Read fields.
+            reader.Read();
+            SkipComments(reader);
+            var table = new LTable();
+            while (true)
+            {
+                if (reader.CurrentToken == LuaTableReaderToken.TableEnd)
+                {
+                    reader.Read();
+                    break;
+                }
+                table.Add(LField.Load(reader));
+            }
+            return table;
+        }
+
         public LTable()
         {
 

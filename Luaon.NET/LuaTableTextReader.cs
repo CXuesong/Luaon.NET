@@ -39,7 +39,7 @@ namespace Luaon
 
         private readonly List<LuaContainerContext> contextStack;
         private LuaContainerContext currentContext;
-        private char[] buffer;
+        private readonly char[] buffer;
         private int bufferLength;
         private int bufferPos;
         private bool readerEof;
@@ -146,7 +146,7 @@ namespace Luaon
             return context.ContainerType;
         }
 
-        private string CurrentPath => LuaContainerContext.ToString(contextStack, currentContext);
+        public string CurrentPath => LuaContainerContext.ToString(contextStack, currentContext);
 
         private void AssertContainerType(LuaContainerType type)
         {
