@@ -4,7 +4,7 @@
     <TargetFrameworks>netstandard1.1;netstandard2.0</TargetFrameworks>
     <RootNamespace>Luaon</RootNamespace>
     <PackageId>CXuesong.Luaon</PackageId>
-    <Version>0.2.1</Version>
+    <Version>0.2.2</Version>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <Copyright>Copyright (C) CXuesong 2019</Copyright>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
