@@ -11,6 +11,8 @@ namespace Luaon.Linq
     /// Represents a table in Lua.
     /// </summary>
     /// <remarks>See <a herf="http://www.lua.org/manual/5.3/manual.html#2.1">2.1 Values and Types</a> for the basic concepts on Lua tables.</remarks>
+    [DebuggerDisplay("Count = {Count}")]
+    [DebuggerTypeProxy(typeof(DebuggerView))]
     public class LTable : LToken, ICollection<LField>
     {
 
@@ -293,7 +295,7 @@ namespace Luaon.Linq
         {
             var y = other as LTable;
             if (y == null) return false;
-            if (ReferenceEquals(this, y)) return true; 
+            if (ReferenceEquals(this, y)) return true;
             if (store.Count != y.store.Count) return false;
             var count = store.Count;
             for (int i = 0; i < count; i++)
@@ -322,5 +324,24 @@ namespace Luaon.Linq
         {
             return GetEnumerator();
         }
+
+        internal sealed class DebuggerView
+        {
+
+            private LTable myTable;
+
+            public DebuggerView(LTable table)
+            {
+                Debug.Assert(table != null);
+                myTable = table;
+            }
+
+            public LField[] Items
+            {
+                get { return myTable.store.ToArray(); }
+            }
+
+        }
+
     }
 }

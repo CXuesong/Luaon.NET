@@ -5,6 +5,7 @@ using System.Text;
 
 namespace Luaon.Linq
 {
+    [DebuggerDisplay("{Name}={Value}")]
     public class LField : LToken
     {
 

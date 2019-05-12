@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 
 namespace Luaon.Linq
@@ -7,6 +8,7 @@ namespace Luaon.Linq
     /// <summary>
     /// Represents a read-only Lua value node.
     /// </summary>
+    [DebuggerDisplay("{Value}")]
     public class LValue : LToken, IEquatable<LValue>
     {
 
