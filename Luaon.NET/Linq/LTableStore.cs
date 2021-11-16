@@ -115,8 +115,13 @@ namespace Luaon.Linq
             Debug.Assert(name != null && name.TokenType != LTokenType.Nil);
             if (name.TokenType == LTokenType.Integer) return FieldFromName((int)name, name, allowsCreation);
             // Named field
-            if (fieldsDict.TryGetValue(name, out var field)) return field;
-            return null;
+            if (!fieldsDict.TryGetValue(name, out var field))
+            {
+                if (!allowsCreation) return null;
+                field = new LField(name, LValue.Nil);
+                Add(field);
+            }
+            return field;
         }
 
         public bool RemoveByName(LValue name)
