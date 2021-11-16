@@ -1,12 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard1.1;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>netstandard1.1;netstandard2.0;net6.0</TargetFrameworks>
+    <NoWarn>$(NoWarn);1591</NoWarn>
     <RootNamespace>Luaon</RootNamespace>
     <PackageId>CXuesong.Luaon</PackageId>
-    <Version>0.2.2</Version>
+    <Version>0.2.3</Version>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <Copyright>Copyright (C) CXuesong 2019</Copyright>
+    <Copyright>Copyright (C) CXuesong 2021</Copyright>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Authors>CXuesong</Authors>
     <Company />
@@ -23,7 +24,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta2-18618-05" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
   </ItemGroup>
 
 </Project>
