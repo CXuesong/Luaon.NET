@@ -230,7 +230,7 @@ namespace Luaon
                 bufferLength = bufferLength - bufferPos;
                 bufferPos = 0;
             }
-            var charsRead = Reader.ReadBlock(buffer, bufferPos, charsNeeded);
+            var charsRead = Reader.ReadBlock(buffer, bufferLength, charsNeeded);
             bufferLength += charsRead;
             if (charsRead < charsNeeded)
             {
