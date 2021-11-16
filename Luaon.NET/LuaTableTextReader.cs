@@ -40,8 +40,8 @@ namespace Luaon
         private readonly List<LuaContainerContext> contextStack;
         private LuaContainerContext currentContext;
         private readonly char[] buffer;
-        private int bufferLength;
-        private int bufferPos;
+        private int bufferLength;   // Loaded buffer end position
+        private int bufferPos;      // Start of next buffer character
         private bool readerEof;
 
         private static readonly object boxedTrue = true;
@@ -98,6 +98,7 @@ namespace Luaon
         private void GotoNextState(Token token)
         {
             var next = NextStateTable[(int)currentState][(int)token];
+            Debug.WriteLine("GotoNextState: {0}[{1}] -> {2}", currentState, token, next);
             if (next == State.Error)
             {
                 if (currentState == State.End)
@@ -230,6 +231,7 @@ namespace Luaon
                 bufferLength = bufferLength - bufferPos;
                 bufferPos = 0;
             }
+            // Read from where the current loaded buffer ends.
             var charsRead = Reader.ReadBlock(buffer, bufferLength, charsNeeded);
             bufferLength += charsRead;
             if (charsRead < charsNeeded)
@@ -438,6 +440,7 @@ namespace Luaon
             if ((o = ReadLiteral()) != null)
             {
                 GotoNextState(Token.Literal);
+                Debug.WriteLine("Literal: {0}", o);
                 if (currentState == State.Key)
                 {
                     currentContext.BoxedKey = o;
@@ -456,6 +459,7 @@ namespace Luaon
                 GotoNextState(Token.KeyStart);
                 GotoNextState(Token.Literal);
                 GotoNextState(Token.KeyEnd);
+                Debug.WriteLine("Identifier: {0}", o);
                 CurrentValue = o;
                 // We keep using BoxedKey instead of Key in Reader.
                 currentContext.BoxedKey = (string)o;
