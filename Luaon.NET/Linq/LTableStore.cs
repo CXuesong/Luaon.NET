@@ -95,18 +95,23 @@ namespace Luaon.Linq
             }
 
             // Get the positional field
-            int positionalIndex = 0;
+            var positionalIndex = 0;
             foreach (var i in Items)
             {
                 if (i.Name != null) continue;
                 positionalIndex++;
                 if (name == positionalIndex) return i;
             }
-#if NETSTANDARD2_0
-            Debug.Fail("Should not execute to here.");
-#else
-            Debug.Assert(false);
-#endif
+
+            // Create the positional field
+            if (allowsCreation)
+            {
+                // Use implicit index if possible.
+                var f = name == positionalIndex + 1 ? new LField(LValue.Nil) : new LField(name, LValue.Nil);
+                this.Add(f);
+                return f;
+            }
+
             return null;
         }
 
@@ -119,7 +124,7 @@ namespace Luaon.Linq
             {
                 if (!allowsCreation) return null;
                 field = new LField(name, LValue.Nil);
-                Add(field);
+                this.Add(field);
             }
             return field;
         }
