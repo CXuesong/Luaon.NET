@@ -228,7 +228,7 @@ namespace Luaon
             {
                 // Shift unread chars to the left; reduce buffer length.
                 Array.Copy(buffer, bufferPos, buffer, 0, bufferLength - bufferPos);
-                bufferLength = bufferLength - bufferPos;
+                bufferLength -= bufferPos;
                 bufferPos = 0;
             }
             // Read from where the current loaded buffer ends.
@@ -236,10 +236,12 @@ namespace Luaon
             bufferLength += charsRead;
             if (charsRead < charsNeeded)
             {
+                // Reader must have reached EOF.
+                Debug.Assert(Reader.Peek() < 0);
                 readerEof = true;
                 return false;
             }
-            return false;
+            return true;
         }
 
         private bool LookAhead(char c)
