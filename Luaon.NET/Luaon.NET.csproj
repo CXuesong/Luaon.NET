@@ -5,9 +5,9 @@
     <NoWarn>$(NoWarn);1591</NoWarn>
     <RootNamespace>Luaon</RootNamespace>
     <PackageId>CXuesong.Luaon</PackageId>
-    <Version>0.2.3</Version>
+    <Version>0.2.4</Version>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <Copyright>Copyright (C) CXuesong 2021</Copyright>
+    <Copyright>Copyright (C) CXuesong 2022</Copyright>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Authors>CXuesong</Authors>
     <Company />
