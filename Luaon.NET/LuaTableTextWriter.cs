@@ -209,7 +209,7 @@ namespace Luaon
         /// </summary>
         public virtual void WriteStartTable()
         {
-            GotoNextState(Token.TableStart);
+            DelimitLastValue(Token.TableStart);
             Push(LuaContainerType.Table);
             Writer.Write('{');
         }
@@ -351,9 +351,11 @@ namespace Luaon
             var s = currentState;
             GotoNextState(nextToken);
 
+            // We are starting to write next field.
             if (s == State.FieldStart)
             {
                 // In the middle of a table.
+                // We may need to close the last field.
                 if (currentContext.Key != null)
                 {
                     currentContext.Key = null;

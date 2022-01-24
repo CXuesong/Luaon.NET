@@ -98,7 +98,7 @@ namespace XUnitTestProject1.Tests
 
                 tw.WriteEndTable();
                 tw.Flush();
-                Assert.Equal("{{1,2,3},4,Named5=5{6,Named7=7}}", sw.ToString());
+                Assert.Equal("{{1,2,3},4,Named5=5,{6,Named7=7}}", sw.ToString());
             }
         }
 
