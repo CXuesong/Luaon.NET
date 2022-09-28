@@ -759,7 +759,7 @@ namespace Luaon
                     }
                     else
                     {
-                        return Convert.ToDouble(expr) * signFactor;
+                        return double.Parse(expr, System.Globalization.CultureInfo.InvariantCulture) * signFactor;
                     }
                 }
                 else if (signFactor == -1) // We have already consumed "-"
