@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Text;
 
@@ -748,18 +749,18 @@ namespace Luaon
                     // 2147483647
                     if (!needFloat && expr.Length < 10)
                     {
-                        var v = Convert.ToInt32(expr) * signFactor;
+                        var v = Convert.ToInt32(expr, CultureInfo.InvariantCulture) * signFactor;
                         return v == 0 ? boxedZero : v;
                     }
                     // 9223372036854775807
                     else if (!needFloat && expr.Length < 19)
                     {
-                        var v = Convert.ToInt64(expr) * signFactor;
+                        var v = Convert.ToInt64(expr, CultureInfo.InvariantCulture) * signFactor;
                         return v == 0 ? boxedZero : v;
                     }
                     else
                     {
-                        return double.Parse(expr, System.Globalization.CultureInfo.InvariantCulture) * signFactor;
+                        return Convert.ToDouble(expr, CultureInfo.InvariantCulture) * signFactor;
                     }
                 }
                 else if (signFactor == -1) // We have already consumed "-"
