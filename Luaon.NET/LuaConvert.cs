@@ -445,7 +445,7 @@ namespace Luaon
                     switch (c)
                     {
                         case '\\':
-                            writer.Write("\\");
+                            writer.Write("\\\\");
                             break;
                         case '\a':
                             writer.Write("\\a");
