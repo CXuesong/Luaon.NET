@@ -15,7 +15,7 @@ namespace XUnitTestProject1.Tests
         [Fact]
         public void ToStringTest()
         {
-            Assert.Equal(@"""test\a\b\r\n\""abc""", LuaConvert.ToString("test\a\b\r\n\"abc"));
+            Assert.Equal(@"""test \\ \a\b\r\n\""abc""", LuaConvert.ToString("test \\ \a\b\r\n\"abc"));
             Assert.Equal(@"'abc""def'", LuaConvert.ToString("abc\"def", "'"));
             Assert.Equal(@"[[test]]", LuaConvert.ToString("test", "[["));
             Assert.Equal(@"[==[test]==]", LuaConvert.ToString("test", "[==["));
