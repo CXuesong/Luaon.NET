@@ -34,7 +34,7 @@ namespace XUnitTestProject1.Tests
                 tw.WriteNil();
                 tw.WriteEndTable();
                 tw.Flush();
-                Assert.Equal("{64,\"\\r\\n\\t\\f\\b?{\\r\\n\\\"\'\",true,10,10.99,0.99,1E-18,0.000000000000000001,\"\",nil,\"This is a string.\",nil}",
+                Assert.Equal(@"{64,""\r\n\t\f\b?{\\r\\n\""'"",true,10,10.99,0.99,1E-18,0.000000000000000001,"""",nil,""This is a string."",nil}",
                     sw.ToString());
             }
         }
